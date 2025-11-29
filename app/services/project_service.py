@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from app.repositories.project_repository import in_memory_project_repo, ProjectRepository
 from app.repositories.task_repository import in_memory_task_repo, TaskRepository
 from app.models.project_model import Project
+from app.utils.func import generate_random_id
 
 load_dotenv()
 
@@ -18,7 +19,7 @@ class ProjectService:
             raise ValueError('title must be less than 30 characters')
         if len(description) > 150:
             raise ValueError('description must be less that 150 characters')
-        project = Project(project_id=123, title='123', description='123')
+        project = Project(project_id=generate_random_id(), title=title, description=description)
         self.repo.create(project=project)
         return project
         
