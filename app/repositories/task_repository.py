@@ -1,13 +1,18 @@
 from datetime import date
+<<<<<<< Updated upstream
 from typing import Protocol, Any, Iterable
+=======
+from dotenv import load_dotenv
+from typing import Protocol, Any, Sequence
+>>>>>>> Stashed changes
 from app.models.task_model import Task
 
 class TaskRepository(Protocol):
     def get(self, task_id:int) -> Task | None: ...
     def create(self, task:Task) -> Task: ...
     def update(self, task:Task) -> Task: ...
-    def filter(self, project_id:int|None=None) -> Iterable[Task]: ...
-    def all(self) -> Iterable[Task]: ...
+    def filter(self, project_id:int|None=None) -> Sequence[Task]: ...
+    def all(self) -> Sequence[Task]: ...
     def delete(self, task_id:int) -> None:...
 
 class InMemoryTaskRepository(TaskRepository):
@@ -45,14 +50,14 @@ class InMemoryTaskRepository(TaskRepository):
         instance.description = task.description
         return instance
     
-    def filter(self, project_id: int | None = None) -> Iterable[Task]:
+    def filter(self, project_id: int | None = None) -> Sequence[Task]:
         result = list()
         for task in self.tasks:
             if task.project_id == project_id:
                 result.append(task)
         return result
     
-    def all(self) -> Iterable[Task]:
+    def all(self) -> Sequence[Task]:
         return self.tasks
     
     def delete(self, task_id: int) -> None:

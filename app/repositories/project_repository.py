@@ -1,4 +1,10 @@
+<<<<<<< Updated upstream
 from typing import Protocol, Iterable
+=======
+import os
+from dotenv import load_dotenv
+from typing import Protocol, Sequence
+>>>>>>> Stashed changes
 from app.models.project_model import Project
 
 
@@ -6,8 +12,8 @@ class ProjectRepository(Protocol):
     def get(self, project_id:int) -> Project | None: ...
     def create(self, project:Project) -> Project: ...
     def update(self, project:Project) -> Project: ...
-    def filter(self, title:str|None=None) -> Iterable[Project]: ...
-    def all(self) -> Iterable[Project]: ...
+    def filter(self, title:str|None=None) -> Sequence[Project]: ...
+    def all(self) -> Sequence[Project]: ...
     def delete(self, project_id:int) -> None:...
 
 
@@ -42,14 +48,14 @@ class InMemoryProjectRepository(ProjectRepository):
         instance.description = project.description
         return instance
     
-    def filter(self, title: str | None = None) -> Iterable[Project]:
+    def filter(self, title: str | None = None) -> Sequence[Project]:
         result = list()
         for project in self.projects:
             if project.title == title:
                 result.append(project)
         return result
 
-    def all(self) -> Iterable[Project]:
+    def all(self) -> Sequence[Project]:
         return self.projects
 
     def delete(self, project_id:int) -> None:
