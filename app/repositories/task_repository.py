@@ -1,10 +1,4 @@
-from datetime import date
-<<<<<<< Updated upstream
-from typing import Protocol, Any, Iterable
-=======
-from dotenv import load_dotenv
 from typing import Protocol, Any, Sequence
->>>>>>> Stashed changes
 from app.models.task_model import Task
 
 class TaskRepository(Protocol):
