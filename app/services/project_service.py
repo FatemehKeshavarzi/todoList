@@ -26,3 +26,6 @@ class ProjectService:
         validate_project_title(title=title)
         validate_project_description(description=description)
         return self.repo.update(project_id=project_id, title=title, description=description)
+
+    def delete_project(self, project_id:int) -> None:
+        self.repo.delete(project_id=project_id)
