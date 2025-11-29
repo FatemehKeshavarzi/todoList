@@ -19,8 +19,7 @@ class ProjectService:
         if len(self.repo.all()) >= int(os.getenv('MAX_NUMBER_OF_PROJECT', 0)):
             raise ValueError('max number of project exceeded')
         project = Project(project_id=generate_random_id(), title=title, description=description)
-        self.repo.create(project=project)
-        return project
+        return self.repo.create(project=project)
     
     def update_project(self, project_id:int, title:str, description:str) -> Project:
         validate_project_title(title=title)
