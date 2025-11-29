@@ -15,7 +15,7 @@ class CLIHandler:
         self.start()
 
     def start(self):
-        print('Enter option:')
+        print('\n\nEnter option:')
         print('1 - Show projects')
         print('2 - Add project')
         print('3 - Update project')
@@ -97,6 +97,7 @@ class CLIHandler:
         title = input('title => ')
         description = input('description => ')
         deadline = input('deadline date (optional) eg:2000/10/30 => ')
+        deadline = None if not deadline else deadline
         status : str = input('status [done, doing, todo] (default=todo)  => ') or 'todo'
         task = self.task_service.create_task(project_id=project_id,
                                              title=title,
