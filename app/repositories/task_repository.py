@@ -1,10 +1,10 @@
-from typing import Protocol, Any, Sequence
+from typing import Protocol, Any, Sequence, Literal
 from app.models.task_model import Task
 
 class TaskRepository(Protocol):
     def get(self, task_id:int) -> Task | None: ...
     def create(self, task:Task) -> Task: ...
-    def update(self, task:Task) -> Task: ...
+    def update(self, task_id:int, title:str, description:str, deadline:str|None, status:Literal['done', 'doing', 'todo']) -> Task: ...
     def filter(self, project_id:int|None=None) -> Sequence[Task]: ...
     def all(self) -> Sequence[Task]: ...
     def delete(self, task_id:int) -> None:...
@@ -32,16 +32,16 @@ class InMemoryTaskRepository(TaskRepository):
         self.tasks.append(task)
         return task
     
-    def update(self, task: Task) -> Task:
-        instance = self.get(task_id=task.task_id)
+    def update(self, task_id:int, title:str, description:str, deadline:str|None, status:Literal['done', 'doing', 'todo']) -> Task:
+        instance = self.get(task_id=task_id)
         if not instance:
             raise ValueError('task with this task_id does not exist')
-        if task.status not in ['done', 'doing', 'todo']:
+        if status not in ['done', 'doing', 'todo']:
             raise ValueError('invalid status')
-        instance.status = task.status
-        instance.deadline = task.deadline
-        instance.title = task.title
-        instance.description = task.description
+        instance.status = status
+        instance.deadline = deadline
+        instance.title = title
+        instance.description = description
         return instance
     
     def filter(self, project_id: int | None = None) -> Sequence[Task]:
