@@ -21,7 +21,9 @@ class CLIHandler:
         print('3 - Update project')
         print('4 - Delete project')
         print('5 - Show project tasks')
-        print('6 - Add tasks')
+        print('6 - Add task')
+        print('7 - Update task')
+        print('8 - Delete task')
         print('10 - Exit\n')
         option = input('Option => ')
         if option == '1':
@@ -36,6 +38,10 @@ class CLIHandler:
             self._list_project_tasks()
         elif option == '6':
             self._create_task()
+        elif option == '7':
+            self._update_task()
+        elif option == '8':
+            self._delete_task()
         elif option == '10':
             return
         else:
