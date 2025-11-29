@@ -1,17 +1,11 @@
-<<<<<<< Updated upstream
-from typing import Protocol, Iterable
-=======
-import os
-from dotenv import load_dotenv
 from typing import Protocol, Sequence
->>>>>>> Stashed changes
 from app.models.project_model import Project
 
 
 class ProjectRepository(Protocol):
     def get(self, project_id:int) -> Project | None: ...
     def create(self, project:Project) -> Project: ...
-    def update(self, project:Project) -> Project: ...
+    def update(self, project_id:int, title:str, description:str) -> Project: ...
     def filter(self, title:str|None=None) -> Sequence[Project]: ...
     def all(self) -> Sequence[Project]: ...
     def delete(self, project_id:int) -> None:...
@@ -38,14 +32,14 @@ class InMemoryProjectRepository(ProjectRepository):
         self.projects.append(project)
         return project
 
-    def update(self, project:Project) -> Project:
-        instance = self.get(project_id=project.project_id)
+    def update(self, project_id:int, title:str, description:str) -> Project:
+        instance = self.get(project_id=project_id)
         if not instance:
             raise ValueError('project with this project_id does not exist')
-        if self.filter(title=project.title):
+        if self.filter(title=title):
             raise ValueError('project with this title already exists')
-        instance.title = project.title
-        instance.description = project.description
+        instance.title = title
+        instance.description = description
         return instance
     
     def filter(self, title: str | None = None) -> Sequence[Project]:
