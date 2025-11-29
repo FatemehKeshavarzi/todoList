@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from typing import Literal
+from typing import Literal, Sequence
 from datetime import date
 from app.repositories.task_repository import TaskRepository
 from app.models.project_model import Project
@@ -34,3 +34,6 @@ class TaskService:
     
     def delete_task(self, task_id:int) -> None:
         self.repo.delete(task_id=task_id)
+
+    def list_tasks(self, project_id) -> Sequence[Task]:
+        return self.repo.filter(project_id=project_id)

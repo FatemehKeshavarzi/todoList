@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from typing import Sequence
 from app.repositories.project_repository import ProjectRepository
 from app.models.project_model import Project
 from app.utils.func import generate_random_id
@@ -27,3 +28,6 @@ class ProjectService:
 
     def delete_project(self, project_id:int) -> None:
         self.repo.delete(project_id=project_id)
+
+    def list_projects(self) -> Sequence[Project]:
+        return self.repo.all()
