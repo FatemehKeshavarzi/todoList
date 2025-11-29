@@ -1,9 +1,6 @@
-import os
-from dotenv import load_dotenv
 from typing import Protocol, Iterable
 from app.models.project_model import Project
 
-load_dotenv()
 
 class ProjectRepository(Protocol):
     def get(self, project_id:int) -> Project | None: ...
@@ -26,8 +23,6 @@ class InMemoryProjectRepository(ProjectRepository):
         return None
 
     def create(self, project:Project) -> Project:
-        if len(self.projects) >= int(os.getenv('MAX_NUMBER_OF_PROJECT', 0)):
-            raise ValueError('max number of project exceeded')
         instance = self.get(project_id=project.project_id)
         if instance:
             raise ValueError('project with this project_id already exists')

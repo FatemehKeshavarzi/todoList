@@ -1,10 +1,6 @@
-import os
 from datetime import date
-from dotenv import load_dotenv
 from typing import Protocol, Any, Iterable
 from app.models.task_model import Task
-
-load_dotenv()
 
 class TaskRepository(Protocol):
     def get(self, task_id:int) -> Task | None: ...
@@ -26,8 +22,6 @@ class InMemoryTaskRepository(TaskRepository):
         return None
     
     def create(self, task:Task) -> Task:
-        if len(self.tasks) >= int(os.getenv('MAX_NUMBER_OF_TASK', 0)):
-            raise ValueError('max number of task exceeded')
         from app.repositories.project_repository import in_memory_project_repo
         if not in_memory_project_repo.get(project_id=task.project_id):
             raise ValueError('invalid project_id')
