@@ -31,4 +31,6 @@ class TaskService:
             deadline_date : date = parse_deadline(deadline=deadline)
             validate_task_deadline(deadline=deadline_date)
         return self.repo.update(task_id=task_id, title=title, description=description, deadline=deadline, status=status)
-            
+    
+    def delete_task(self, task_id:int) -> None:
+        self.repo.delete(task_id=task_id)
