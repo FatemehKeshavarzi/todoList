@@ -15,7 +15,8 @@ class CLIHandler:
         self.start()
 
     def start(self):
-        print('\n\nEnter option:')
+        print('=============MENU=============')
+        print('Enter option:')
         print('1 - Show projects')
         print('2 - Add project')
         print('3 - Update project')
@@ -24,7 +25,8 @@ class CLIHandler:
         print('6 - Add task')
         print('7 - Update task')
         print('8 - Delete task')
-        print('10 - Exit\n')
+        print('10 - Exit')
+        print('==============================')
         option = input('Option => ')
         if option == '1':
             self._list_projects()
