@@ -9,6 +9,7 @@ class ProjectRepository(Protocol):
     def filter(self, title:str|None=None) -> Sequence[Project]: ...
     def all(self) -> Sequence[Project]: ...
     def delete(self, project_id:int) -> None:...
+    def count_all(self) -> int : ...
 
 
 class InMemoryProjectRepository(ProjectRepository):
@@ -61,6 +62,9 @@ class InMemoryProjectRepository(ProjectRepository):
         tasks = in_memory_task_repo.filter(project_id=project_id)
         for task in tasks:
             in_memory_task_repo.delete(task_id=task.task_id)
+
+    def count_all(self) -> int :
+        return len(self.projects)
 
 
 in_memory_project_repo = InMemoryProjectRepository()

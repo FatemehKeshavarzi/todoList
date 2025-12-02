@@ -8,6 +8,7 @@ class TaskRepository(Protocol):
     def filter(self, project_id:int|None=None) -> Sequence[Task]: ...
     def all(self) -> Sequence[Task]: ...
     def delete(self, task_id:int) -> None:...
+    def count_all(self) -> int : ...
 
 class InMemoryTaskRepository(TaskRepository):
 
@@ -59,6 +60,10 @@ class InMemoryTaskRepository(TaskRepository):
         if not task:
             raise ValueError('task does not exist')
         self.tasks.remove(task)
+
+    def count_all(self) -> int :
+        return len(self.tasks)
+    
 
 
 in_memory_task_repo = InMemoryTaskRepository()
