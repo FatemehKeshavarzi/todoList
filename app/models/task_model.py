@@ -1,9 +1,10 @@
-from datetime import date
+from datetime import date, datetime
 from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, String, Date, Enum
+from sqlalchemy import ForeignKey, String, Date, Enum, DateTime
 from enum import StrEnum
 from app.models.base import BaseModel
+
 
 if TYPE_CHECKING:
     from .project_model import Project
@@ -25,6 +26,7 @@ class Task(BaseModel):
     deadline: Mapped[date | None] = mapped_column(Date, nullable=True)
     status : Mapped[TaskStatus] = mapped_column(Enum(TaskStatus), default=TaskStatus.TODO)
     project : Mapped['Project'] = relationship(back_populates='tasks')
+    closed_at : Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     def __repr__(self) -> str:
         return str(self.code)
