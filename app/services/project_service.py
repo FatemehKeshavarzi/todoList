@@ -21,22 +21,21 @@ class ProjectService:
         validate_project_description(description=description)
         if self.project_repo.count_all() >= int(os.getenv('MAX_NUMBER_OF_PROJECT', 0)):
             raise ValueError('max number of project exceeded')
-        project = Project(project_id=generate_random_id(), title=title, description=description)
-        return self.project_repo.create(project=project)
+        return self.project_repo.create(title=title, description=description)
     
-    def update_project(self, project_id:int, title:str, description:str) -> Project:
+    def update_project(self, project_code:int, title:str, description:str) -> Project:
         validate_project_title(title=title)
         validate_project_description(description=description)
-        return self.project_repo.update(project_id=project_id, title=title, description=description)
+        return self.project_repo.update(project_code=project_code, title=title, description=description)
 
-    def delete_project(self, project_id:int) -> None:
-        self.project_repo.delete(project_id=project_id)
+    def delete_project(self, project_code:int) -> None:
+        self.project_repo.delete(project_code=project_code)
 
     def list_projects(self) -> Sequence[Project]:
         return self.project_repo.all()
     
-    def list_project_tasks(self, project_id:int) -> Sequence[Task]:
-        project = self.project_repo.get(project_id=project_id)
+    def list_project_tasks(self, project_code:int) -> Sequence[Task]:
+        project = self.project_repo.get(project_code=project_code)
         if not project:
-            raise ValueError('invalid project_id')
-        return self.task_repo.filter(project_id=project_id)
+            raise ValueError('invalid project_code')
+        return self.task_repo.filter(project_code=project_code)
