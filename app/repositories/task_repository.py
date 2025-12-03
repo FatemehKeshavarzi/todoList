@@ -1,13 +1,16 @@
-from typing import Protocol, Any, Sequence, Literal
-from app.models.task_model import Task
+from typing import Protocol, Sequence
+from datetime import date
+from app.models import Task, TaskStatus
+from app.utils import func
+
 
 class TaskRepository(Protocol):
-    def get(self, task_id:int) -> Task | None: ...
-    def create(self, task:Task) -> Task: ...
-    def update(self, task_id:int, title:str, description:str, deadline:str|None, status:Literal['done', 'doing', 'todo']) -> Task: ...
-    def filter(self, project_id:int|None=None) -> Sequence[Task]: ...
+    def get(self, task_code:int) -> Task | None: ...
+    def create(self, project_code:int, title:str, description:str, deadline:date|None, status:TaskStatus) -> Task: ...
+    def update(self, task_code:int, title:str, description:str, deadline:date|None, status:TaskStatus) -> Task: ...
+    def filter(self, project_code:int|None=None) -> Sequence[Task]: ...
     def all(self) -> Sequence[Task]: ...
-    def delete(self, task_id:int) -> None:...
+    def delete(self, task_code:int) -> None:...
     def count_all(self) -> int : ...
 
 class InMemoryTaskRepository(TaskRepository):
@@ -15,48 +18,46 @@ class InMemoryTaskRepository(TaskRepository):
     def __init__(self) -> None:
         self.tasks : list[Task] = list()
 
-    def get(self, task_id: int) -> Task | None:
+    def get(self, task_code: int) -> Task | None:
         for task in self.tasks:
-            if task.task_id == task_id:
+            if task.code == task_code:
                 return task
         return None
     
-    def create(self, task:Task) -> Task:
+    def create(self, project_code:int, title:str, description:str, deadline:date|None, status:TaskStatus) -> Task:
         from app.repositories.project_repository import in_memory_project_repo
-        if not in_memory_project_repo.get(project_id=task.project_id):
-            raise ValueError('invalid project_id')
-        instance = self.get(task_id=task.task_id)
-        if instance:
-            raise ValueError('task with this task_id already exists')
-        if task.status not in ['done', 'doing', 'todo']:
-            raise ValueError('invalid status')
+        task_code = func.generate_random_id()
+        project = in_memory_project_repo.get(project_code=project_code)
+        if not project:
+            raise ValueError('invalid project_code')
+        if self.get(task_code=task_code):
+            raise ValueError('task with this task_code already exists')
+        task = Task(code=task_code, project_code=project_code, title=title, description=description, deadline=deadline, status=status)
         self.tasks.append(task)
         return task
     
-    def update(self, task_id:int, title:str, description:str, deadline:str|None, status:Literal['done', 'doing', 'todo']) -> Task:
-        instance = self.get(task_id=task_id)
+    def update(self, task_code:int, title:str, description:str, deadline:date|None, status:TaskStatus) -> Task:
+        instance = self.get(task_code=task_code)
         if not instance:
-            raise ValueError('task with this task_id does not exist')
-        if status not in ['done', 'doing', 'todo']:
-            raise ValueError('invalid status')
+            raise ValueError('task with this task_code does not exist')
         instance.status = status
         instance.deadline = deadline
         instance.title = title
         instance.description = description
         return instance
     
-    def filter(self, project_id: int | None = None) -> Sequence[Task]:
+    def filter(self, project_code: int | None = None) -> Sequence[Task]:
         result = list()
         for task in self.tasks:
-            if task.project_id == project_id:
+            if task.project_code == project_code:
                 result.append(task)
         return result
     
     def all(self) -> Sequence[Task]:
         return self.tasks
     
-    def delete(self, task_id: int) -> None:
-        task = self.get(task_id=task_id)
+    def delete(self, task_code: int) -> None:
+        task = self.get(task_code=task_code)
         if not task:
             raise ValueError('task does not exist')
         self.tasks.remove(task)
