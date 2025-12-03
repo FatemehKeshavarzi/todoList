@@ -8,7 +8,7 @@ def parse_deadline(deadline: str) -> date:
     Parse a deadline string in format YYYY/MM/DD.
     """
     try:
-        parsed = datetime.strptime(deadline, "%Y/%m/%d").date()
+        parsed = datetime.strptime(deadline, "%Y-%m-%d").date()
         return parsed
     except ValueError:
         raise ValueError('inavlid deadline format')
