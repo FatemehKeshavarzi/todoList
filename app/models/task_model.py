@@ -19,8 +19,8 @@ class TaskStatus(StrEnum):
 class Task(BaseModel):
     __tablename__ = 'task' 
 
-    code : Mapped[int] = mapped_column(unique=True)
-    project_id : Mapped[int] = mapped_column(ForeignKey('project.id'))
+    code : Mapped[int] = mapped_column(primary_key=True)
+    project_code : Mapped[int] = mapped_column(ForeignKey('project.code'))
     title : Mapped[str] = mapped_column(String(30))
     description : Mapped[str] = mapped_column(String(150))
     deadline: Mapped[date | None] = mapped_column(Date, nullable=True)

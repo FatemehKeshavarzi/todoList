@@ -1,8 +1,8 @@
-"""add models
+"""init
 
-Revision ID: c7448ce7589e
-Revises: 83ca1323bcfa
-Create Date: 2025-12-03 10:30:43.688546
+Revision ID: a52d0df39d03
+Revises: 
+Create Date: 2025-12-03 14:01:42.983392
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c7448ce7589e'
-down_revision: Union[str, Sequence[str], None] = '83ca1323bcfa'
+revision: str = 'a52d0df39d03'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -25,24 +25,21 @@ def upgrade() -> None:
     sa.Column('code', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=30), nullable=False),
     sa.Column('description', sa.String(length=150), nullable=False),
-    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_time', sa.DateTime(), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('code'),
+    sa.PrimaryKeyConstraint('code'),
     sa.UniqueConstraint('title')
     )
     op.create_table('task',
     sa.Column('code', sa.Integer(), nullable=False),
-    sa.Column('project_id', sa.Integer(), nullable=False),
+    sa.Column('project_code', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=30), nullable=False),
     sa.Column('description', sa.String(length=150), nullable=False),
     sa.Column('deadline', sa.Date(), nullable=True),
     sa.Column('status', sa.Enum('DONE', 'DOING', 'TODO', name='taskstatus'), nullable=False),
-    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('closed_at', sa.DateTime(), nullable=True),
     sa.Column('created_time', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['project_id'], ['project.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('code')
+    sa.ForeignKeyConstraint(['project_code'], ['project.code'], ),
+    sa.PrimaryKeyConstraint('code')
     )
     # ### end Alembic commands ###
 
