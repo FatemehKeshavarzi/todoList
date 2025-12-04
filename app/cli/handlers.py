@@ -6,12 +6,12 @@ from app.repositories.project_repository import InMemoryProjectRepository, SQLPr
 from app.repositories.task_repository import InMemoryTaskRepository, SQLTaskRepository
 from app.utils import func
 from app.models import TaskStatus, Project, Task
-
+from config import STORAGE
 
 class CLIHandler:
     task_service = TaskService(task_repo=InMemoryTaskRepository())
 
-    def __init__(self, storage:Literal['memory', 'sql']) -> None:
+    def __init__(self, storage:Literal['memory', 'sql'] = STORAGE) -> None:
         if storage == 'memory':
             self.project_service = ProjectService(project_repo=InMemoryProjectRepository(), task_repo=InMemoryTaskRepository())
             self.task_service = TaskService(task_repo=InMemoryTaskRepository())
