@@ -1,5 +1,5 @@
 from typing import Protocol, Sequence
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy import select, func as sa_func
 from sqlalchemy.orm import Session
 from app.models import Task, TaskStatus, Project
@@ -10,7 +10,7 @@ from app.utils import func
 class TaskRepository(Protocol):
     def get(self, session:Session, task_code:int) -> Task | None: ...
     def create(self, session:Session, project_code:int, title:str, description:str, deadline:date|None, status:TaskStatus) -> Task: ...
-    def update(self, session:Session, task_code:int, title:str, description:str, deadline:date|None, status:TaskStatus) -> Task: ...
+    def update(self, session:Session, task_code:int, title:str, description:str, deadline:date|None, status:TaskStatus, closed_at:datetime | None) -> Task: ...
     def filter(self, session:Session, project_code: int | None = None, status__in: list[TaskStatus] | None = None, deadline__lt: date | None = None) -> Sequence[Task]: ...
     def all(self, session:Session) -> Sequence[Task]: ...
     def delete(self, session:Session, task_code:int) -> None:...
@@ -52,7 +52,7 @@ class InMemoryTaskRepository(TaskRepository):
         self.tasks.append(task)
         return task
     
-    def update(self, session:Session, task_code:int, title:str, description:str, deadline:date|None, status:TaskStatus) -> Task:
+    def update(self, session:Session, task_code:int, title:str, description:str, deadline:date|None, status:TaskStatus, closed_at:datetime|None) -> Task:
         instance = self.get(session=session, task_code=task_code)
         if not instance:
             raise ValueError('task with this task_code does not exist')
@@ -60,6 +60,7 @@ class InMemoryTaskRepository(TaskRepository):
         instance.deadline = deadline
         instance.title = title
         instance.description = description
+        instance.closed_at = closed_at
         return instance
     
     def filter(self, session:Session, project_code: int | None = None, status__in: list[TaskStatus] | None = None, deadline__lt: date | None = None) -> Sequence[Task]:
@@ -127,6 +128,7 @@ class SQLTaskRepository(TaskRepository):
         description: str,
         deadline: date | None,
         status: TaskStatus,
+        closed_at:datetime | None
     ) -> Task:
         task = self.get(session=session, task_code=task_code)
         if not task:
@@ -136,6 +138,7 @@ class SQLTaskRepository(TaskRepository):
         task.description = description
         task.deadline = deadline
         task.status = status
+        task.closed_at = closed_at
 
         return task
 
