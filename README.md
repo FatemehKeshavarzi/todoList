@@ -43,3 +43,8 @@ update database
 ```shell
 poetry run alembic upgrade head
 ```
+
+### run scheduler
+```shell
+poetry run python -m app.commands.scheduler
+```
