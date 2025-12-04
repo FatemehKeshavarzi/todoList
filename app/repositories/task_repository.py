@@ -11,7 +11,7 @@ class TaskRepository(Protocol):
     def get(self, session:Session, task_code:int) -> Task | None: ...
     def create(self, session:Session, project_code:int, title:str, description:str, deadline:date|None, status:TaskStatus) -> Task: ...
     def update(self, session:Session, task_code:int, title:str, description:str, deadline:date|None, status:TaskStatus) -> Task: ...
-    def filter(self, session:Session, project_code:int|None=None) -> Sequence[Task]: ...
+    def filter(self, session:Session, project_code: int | None = None, status: TaskStatus | None = None) -> Sequence[Task]: ...
     def all(self, session:Session) -> Sequence[Task]: ...
     def delete(self, session:Session, task_code:int) -> None:...
     def count_all(self, session:Session) -> int : ...
@@ -62,11 +62,14 @@ class InMemoryTaskRepository(TaskRepository):
         instance.description = description
         return instance
     
-    def filter(self, session:Session, project_code: int | None = None) -> Sequence[Task]:
+    def filter(self, session:Session, project_code: int | None = None, status: TaskStatus | None = None) -> Sequence[Task]:
         result = list()
         for task in self.tasks:
-            if task.project_code == project_code:
-                result.append(task)
+            if project_code is not None and task.project_code != project_code:
+                continue
+            if status is not None and task.status != status:
+                continue
+            result.append(task)
         return result
     
     def all(self, session:Session) -> Sequence[Task]:
@@ -134,11 +137,13 @@ class SQLTaskRepository(TaskRepository):
 
         return task
 
-    def filter(self, session:Session, project_code: int | None = None) -> Sequence[Task]:
-        stmt = select(Task)
+    def filter(self, session:Session, project_code: int | None = None, status: TaskStatus | None = None) -> Sequence[Task]:
+        conditions = []
         if project_code is not None:
-            stmt = stmt.where(Task.project_code == project_code)
-
+            conditions.append(Task.project_code == project_code)
+        if status is not None:
+            conditions.append(Task.status == status)
+        stmt = select(Task).where(*conditions)
         return session.scalars(stmt).all()
 
     def all(self, session:Session) -> Sequence[Task]:
