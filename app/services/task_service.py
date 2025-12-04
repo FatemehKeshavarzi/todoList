@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from datetime import date
+from datetime import date, datetime
 from app.repositories.task_repository import TaskRepository
 from app.models import Task, TaskStatus
 from app.utils.validators import validate_task_title, validate_task_description, validate_task_deadline, validate_task_status
@@ -30,8 +30,18 @@ class TaskService:
         if deadline:
             validate_task_deadline(deadline=deadline)
         with SessionLocal.begin() as session:
-            return self.task_repo.update(session=session, task_code=task_code, title=title, description=description, deadline=deadline, status=status)
+            task = self.task_repo.get(session=session, task_code=task_code)
+            if not task:
+                raise ValueError('task not found')
+            return self.task_repo.update(session=session, task_code=task_code, title=title, description=description, deadline=deadline, status=status, closed_at=task.closed_at)
     
+
     def delete_task(self, task_code:int) -> None:
         with SessionLocal.begin() as session:
             self.task_repo.delete(session=session, task_code=task_code)
+
+    def update_epired_tasks(self) -> None:
+        with SessionLocal.begin() as session:
+            expired_tasks = self.task_repo.filter(session=session, status__in=[TaskStatus.DOING, TaskStatus.TODO], deadline__lt=date.today())
+            for task in expired_tasks:
+                self.task_repo.update(session=session, task_code=task.code, title=task.title, description=task.description, deadline=task.deadline, status=TaskStatus.DONE, closed_at=datetime.now())
