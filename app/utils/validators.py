@@ -3,7 +3,7 @@ from app.models import TaskStatus
 
 def validate_task_deadline(deadline:date) -> None:
     if deadline < date.today():
-        raise ValueError('invalid date')
+        raise ValueError('invalid deadline')
 
 
 def validate_project_title(title:str) -> None:
