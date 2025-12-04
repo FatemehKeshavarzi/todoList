@@ -1,5 +1,6 @@
-from app.cli.run import run_cli
-
+from app.cli import CLIHandler
 
 if __name__ == '__main__':
-    run_cli()
+
+    CLIHandler(storage='memory')
+    pass

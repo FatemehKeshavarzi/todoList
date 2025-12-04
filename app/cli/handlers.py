@@ -1,18 +1,29 @@
-from pprint import pprint
+from datetime import date
 from typing import Literal
 from app.services.project_service import ProjectService
 from app.services.task_service import TaskService
-from app.repositories.project_repository import in_memory_project_repo
-from app.repositories.task_repository import in_memory_task_repo
+from app.repositories.project_repository import InMemoryProjectRepository, SQLProjectRepository
+from app.repositories.task_repository import InMemoryTaskRepository, SQLTaskRepository
+from app.utils import func
+from app.models import TaskStatus, Project, Task
 
 
 class CLIHandler:
-    project_service = ProjectService(project_repo=in_memory_project_repo, task_repo=in_memory_task_repo)
-    task_service = TaskService(task_repo=in_memory_task_repo)
+    task_service = TaskService(task_repo=InMemoryTaskRepository())
 
-    def __init__(self) -> None:
+    def __init__(self, storage:Literal['memory', 'sql']) -> None:
+        if storage == 'memory':
+            self.project_service = ProjectService(project_repo=InMemoryProjectRepository(), task_repo=InMemoryTaskRepository())
+            self.task_service = TaskService(task_repo=InMemoryTaskRepository())
+        elif storage == 'sql':
+            self.project_service = ProjectService(project_repo=SQLProjectRepository(), task_repo=SQLTaskRepository())
+            self.task_service = TaskService(task_repo=SQLTaskRepository())
+        else:
+            raise NotImplementedError('invalid storage type')
+
         print('>>>>>>>>> CLI <<<<<<<<<')
         self.start()
+        
 
     def start(self):
         print('=============MENU=============')
@@ -55,33 +66,36 @@ class CLIHandler:
         projects = self.project_service.list_projects()
         if projects:
             for project in projects:
-                pprint(project)
+                self._print_project(project=project)
         else:
             print('There isn\'t any project')
         self.start()
 
     def _update_project(self):
         print('> Update project:')
-        project_id = int(input('project_id => '))
+        project_code = int(input('project_code => '))
         title = input('title => ')
         description = input('description => ')
-        self.project_service.update_project(project_id=project_id, title=title, description=description)
+        self.project_service.update_project(project_code=project_code, title=title, description=description)
         print('Updated successfully')
         self.start()
 
     def _delete_project(self):
         print('> Delete project:')
-        project_id = int(input('project_id => '))
-        self.project_service.delete_project(project_id=project_id)
+        project_code = int(input('project_code => '))
+        self.project_service.delete_project(project_code=project_code)
         print('Deleted successfully')
         self.start()
 
     def _list_project_tasks(self):
         print('> Project tasks:')
-        project_id = int(input('project_id => '))
-        tasks = self.project_service.list_project_tasks(project_id=project_id)
-        for task in tasks:
-            pprint(task)
+        project_code = int(input('project_code => '))
+        tasks = self.project_service.list_project_tasks(project_code=project_code)
+        if tasks:
+            for task in tasks:
+                self._print_task(task=task)
+        else:
+            print('There isn\'t any task')
         self.start()
     
     def _create_project(self):
@@ -90,48 +104,65 @@ class CLIHandler:
         description = input('description => ')
         project = self.project_service.create_project(title=title, description=description)
         print('> New project')
-        pprint(project)
+        self._print_project(project=project)
         self.start()
 
     def _create_task(self):
         print('> Add task:')
-        project_id = int(input('project_id => '))
+        project_code = int(input('project_code => '))
         title = input('title => ')
         description = input('description => ')
-        deadline = input('deadline date (optional) eg:2000/10/30 => ')
-        deadline = None if not deadline else deadline
+        input_deadline = input('deadline date (optional) eg:2000-10-30 => ')
+        deadline : date | None = func.parse_deadline(deadline=input_deadline) if input_deadline else None
         status : str = input('status [done, doing, todo] (default=todo)  => ') or 'todo'
-        task = self.task_service.create_task(project_id=project_id,
+        task = self.task_service.create_task(project_code=project_code,
                                              title=title,
                                              description=description,
                                              deadline=deadline,
-                                             status=status)
+                                             status=TaskStatus(status))
         print('> New task')
-        pprint(task)
+        self._print_task(task=task)
         self.start()
 
     def _update_task(self):
         print('> Update task:')
-        task_id = int(input('task_id => '))
+        task_code = int(input('task_code => '))
         title = input('title => ')
         description = input('description => ')
-        deadline = input('deadline date (optional) eg:2000/10/30 => ')
+        input_deadline = input('deadline date (optional) eg:2000/10/30 => ')
+        deadline : date | None = func.parse_deadline(deadline=input_deadline) if input_deadline else None
         status : str = input('status [done, doing, todo] (default=todo)  => ') or 'todo'
-        task = self.task_service.update_task(task_id=task_id,
+        task = self.task_service.update_task(task_code=task_code,
                                       title=title,
                                       description=description,
                                       deadline=deadline,
-                                      status=status)
+                                      status=TaskStatus(status))
         print('Updated successfully')
         self.start()
 
     def _delete_task(self):
         print('> Delete task:')
-        task_id = int(input('task_id => '))
-        self.task_service.delete_task(task_id=task_id)
+        task_code = int(input('task_code => '))
+        self.task_service.delete_task(task_code=task_code)
         print('Deleted successfully')
         self.start()
 
 
-        
+    def _print_project(self, project:Project):
+        print('---------')
+        print(f'code: {project.code}')
+        print(f'title: {project.title}')
+        print(f'description: {project.description}')
+        print(f'created_time: {project.created_time}')
+
+    def _print_task(self, task:Task):
+        print('---------')
+        print(f'task_code: {task.code}')
+        print(f'title: {task.title}')
+        print(f'description: {task.description}')
+        print(f'status: {task.status}')
+        print(f'created_time: {task.created_time}')
+        print(f'deadline: {task.deadline}')
+        print(f'closed_at: {task.closed_at}')
+
         
