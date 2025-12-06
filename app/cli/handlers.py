@@ -17,10 +17,9 @@ class CLIHandler:
     def __init__(self, storage:Literal['memory', 'sql'] = STORAGE) -> None:
 
         """
-        NOTE: The CLI interface is planned for deprecation and will be removed in a future version. 
-        Please start using the API endpoint instead.
+        NOTE: The CLI interface is deprecated. Please start using the API endpoint instead.
         """
-        logger.warning('Warning: The CLI interface is planned for deprecation and will be removed in a future version.\nPlease start using the API endpoint instead')
+        logger.warning('Warning: The CLI interface is deprecated. Please start using the API endpoint instead.')
 
 
         if storage == 'memory':
