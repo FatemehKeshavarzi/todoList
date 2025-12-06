@@ -1,5 +1,6 @@
 from datetime import date
 from typing import Literal
+import logging
 from app.services.project_service import ProjectService
 from app.services.task_service import TaskService
 from app.repositories.project_repository import InMemoryProjectRepository, SQLProjectRepository
@@ -8,10 +9,20 @@ from app.utils import func
 from app.models import TaskStatus, Project, Task
 from config import STORAGE
 
+logger = logging.getLogger(__file__)
+
 class CLIHandler:
     task_service = TaskService(task_repo=InMemoryTaskRepository())
 
     def __init__(self, storage:Literal['memory', 'sql'] = STORAGE) -> None:
+
+        """
+        NOTE: The CLI interface is planned for deprecation and will be removed in a future version. 
+        Please start using the API endpoint instead.
+        """
+        logger.warning('Warning: The CLI interface is planned for deprecation and will be removed in a future version.\nPlease start using the API endpoint instead')
+
+
         if storage == 'memory':
             self.project_service = ProjectService(project_repo=InMemoryProjectRepository(), task_repo=InMemoryTaskRepository())
             self.task_service = TaskService(task_repo=InMemoryTaskRepository())
