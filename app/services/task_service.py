@@ -33,9 +33,9 @@ class TaskService:
             task = self.task_repo.get(session=session, task_code=task_code)
             if not task:
                 raise ValueError('task not found')
-            return self.task_repo.update(session=session, task_code=task_code, title=title, description=description, deadline=deadline, status=status, closed_at=task.closed_at)
+            closed_at = datetime.now() if status == TaskStatus.DONE else task.closed_at
+            return self.task_repo.update(session=session, task_code=task_code, title=title, description=description, deadline=deadline, status=status, closed_at=closed_at)
     
-
     def delete_task(self, task_code:int) -> None:
         with SessionLocal.begin() as session:
             self.task_repo.delete(session=session, task_code=task_code)
